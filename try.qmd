@@ -1,0 +1,448 @@
+---
+title: "DAS Project 1"
+author: "Group 01"
+number-sections: true
+format: 
+  html:
+    embed-resources: true
+    code-tools: true
+  pdf: default
+editor_options: 
+  chunk_output_type: console
+execute:
+  echo: true
+  eval: true
+  warning: false
+  message: false
+---
+
+```{r}
+library(tidyverse)
+library(moderndive)
+library(gapminder)
+library(sjPlot)
+library(stats)
+library(jtools)
+library(gt)
+library(GGally)
+library(gridExtra)
+```
+
+# Introduction
+
+···data description···
+
+```{r}
+house_data <- read.csv("dataset03.csv")
+```
+
+```{r}
+#| label: tbl-data-overview1
+#| tbl-cap: house data overview Part I
+#| echo: false
+
+house_data |>
+  select(Total.Household.Income:Total.Food.Expenditure) |>
+  slice_head(n = 6) |>
+  gt()
+```
+
+```{r}
+#| label: tbl-data-overview2
+#| tbl-cap: house data overview Part II
+#| echo: false
+
+house_data |>
+  select(Household.Head.Sex:Total.Number.of.Family.members) |>
+  slice_head(n = 6) |>
+  gt()
+```
+
+```{r}
+#| label: tbl-data-overview3
+#| tbl-cap: house data overview Part III
+#| echo: false
+
+house_data |>
+  select(House.Floor.Area:Electricity) |>
+  slice_head(n = 6) |>
+  gt()
+```
+
+# Data Processing
+
+···brief intro: describe we have numerical summary & visualization···
+
+## Data Numerical Summary
+···brief intro for each explanatory var,like mean is? median is? compare mean and median, ex. mean is bigger than median, indicating that existing outliers higher the mean;sd is? indicating the data distribution id dispersed or not?···
+```{r}
+#| label: tbl-numerical-out
+#| tbl-cap: Numerical Summary for Total Number of Family Members
+#| echo: false
+
+house_data |>
+  summarise(mean = mean(Total.Number.of.Family.members, na.rm = TRUE),
+            median = median(Total.Number.of.Family.members, na.rm = TRUE),
+            std_dev = sd(Total.Number.of.Family.members, na.rm = TRUE)) |>
+  gt() |>
+  fmt_number(decimals = 2)
+```
+
+```{r}
+#| label: tbl-numerical-exp1
+#| tbl-cap: Numerical Summary for Total Household Income
+#| echo: false
+
+house_data |>
+  summarise(mean = mean(Total.Household.Income, na.rm = TRUE),
+            median = median(Total.Household.Income, na.rm = TRUE),
+            std_dev = sd(Total.Household.Income, na.rm = TRUE)) |>
+  gt() |>
+  fmt_number(decimals = 2)
+```
+
+```{r}
+#| label: tbl-numerical-exp2
+#| tbl-cap: Numerical Summary for Total Household Income
+#| echo: false
+
+house_data |>
+  summarise(mean = mean(Total.Food.Expenditure, na.rm = TRUE),
+            median = median(Total.Food.Expenditure, na.rm = TRUE),
+            std_dev = sd(Total.Food.Expenditure, na.rm = TRUE)) |>
+  gt() |>
+  fmt_number(decimals = 2)
+```
+
+```{r}
+#| label: tbl-numerical-exp3
+#| tbl-cap: Numerical Summary for Household Head Age
+#| echo: false
+
+house_data |>
+  summarise(mean = mean(Household.Head.Age, na.rm = TRUE),
+            median = median(Household.Head.Age, na.rm = TRUE),
+            std_dev = sd(Household.Head.Age, na.rm = TRUE)) |>
+  gt() |>
+  fmt_number(decimals = 2)
+```
+
+```{r}
+#| label: tbl-numerical-exp4
+#| tbl-cap: Numerical Summary for House Floor Area
+#| echo: false
+
+house_data |>
+  summarise(mean = mean(House.Floor.Area, na.rm = TRUE),
+            median = median(House.Floor.Area, na.rm = TRUE),
+            std_dev = sd(House.Floor.Area, na.rm = TRUE)) |>
+  gt() |>
+  fmt_number(decimals = 2)
+```
+
+```{r}
+#| label: tbl-numerical-exp5
+#| tbl-cap: Numerical Summary for House Age
+#| echo: false
+
+house_data |>
+  summarise(mean = mean(House.Age, na.rm = TRUE),
+            median = median(House.Age, na.rm = TRUE),
+            std_dev = sd(House.Age, na.rm = TRUE)) |>
+  gt() |>
+  fmt_number(decimals = 2)
+```
+
+```{r}
+#| label: tbl-numerical-exp6
+#| tbl-cap: Numerical Summary for Number of Bedrooms
+#| echo: false
+
+house_data |>
+  summarise(mean = mean(Number.of.bedrooms, na.rm = TRUE),
+            median = median(Number.of.bedrooms, na.rm = TRUE),
+            std_dev = sd(Number.of.bedrooms, na.rm = TRUE)) |>
+  gt() |>
+  fmt_number(decimals = 2)
+```
+
+
+## Missing Values
+···brief intro : just say that we do not have missing values···
+```{r}
+#| label: tbl-missing1
+#| tbl-cap: missing value Part I
+#| echo: false
+
+house_data %>%
+  summarise(across(Total.Household.Income:Total.Food.Expenditure, 
+                   ~ sum(is.na(.)))) |>
+  gt()
+```
+
+```{r}
+#| label: tbl-missing2
+#| tbl-cap: missing value Part II
+#| echo: false
+
+house_data %>%
+  summarise(across(Household.Head.Sex:Total.Number.of.Family.members, 
+                   ~ sum(is.na(.)))) |>
+  gt()
+```
+
+```{r}
+#| label: tbl-missing3
+#| tbl-cap: missing value Part III
+#| echo: false
+
+house_data %>%
+  summarise(across(House.Floor.Area:Electricity, 
+                   ~ sum(is.na(.)))) |>
+  gt()
+```
+
+
+# Data Visualization
+
+··· intro about each graph```
+
+```{r}
+#| label: fig-pairs
+#| fig-cap: pairs graph of the house data
+#| fig-width: 9
+#| fig-height: 9
+#| echo: false
+
+ggpairs(house[,c(5,1,2,4,6,7,8)])
+```
+
+```{r}
+#| label: fig-boxplot-categories
+#| fig-cap: boxplot of Categories variables
+#| echo: false
+
+box1 <- ggplot(data = house_data,
+       mapping = aes(x = Household.Head.Sex,
+                     y = Total.Number.of.Family.members)) + 
+  geom_boxplot(fill = "steelblue") + 
+  ggtitle("Boxplot of Householder Sex")
+
+box2 <- ggplot(data = house_data,
+       mapping = aes(x = Type.of.Household,
+                     y = Total.Number.of.Family.members)) + 
+  geom_boxplot(fill = "steelblue") + 
+  ggtitle("Boxplot of House Type") + 
+  scale_x_discrete(labels = c("Extend", "Single", ">= 2"))
+
+house_data$Electricity <- as.factor(house_data$Electricity)
+
+box3 <- ggplot(data = house_data,
+       mapping = aes(x = Electricity,
+                     y = Total.Number.of.Family.members)) + 
+  geom_boxplot(fill = "steelblue") + 
+  ggtitle("Boxplot of Electricity") + 
+  scale_x_discrete(labels = c("No", "Yes"))
+
+grid.arrange(box1, box2, box3, ncol = 3)
+```
+
+```{r}
+#| label: fig-hist-of-outcome
+#| fig-cap: histogram of total number of family members
+#| echo: false
+
+ggplot(data = house_data,
+       mapping = aes(x = Total.Number.of.Family.members)) + 
+  geom_histogram(fill = "steelblue",
+                 color = "white")
+```
+
+## Data Processing
+···intro of what we did here: transform the categorical variables with more 2 possible values into dummy variables···
+```{r}
+house <- house_data %>%
+  mutate(Type.of.House.Single = 
+           ifelse(Type.of.Household == "Single Family",
+                  1, 0)) %>% 
+  mutate(Type.of.House.Extend = 
+           ifelse(Type.of.Household == "Extended Family",
+                  1, 0)) %>%
+  select(-c(Region,Type.of.Household))
+```
+
+# Generalized Linear Model
+
+## Model Construction
+~~~ transform the categorical variables into factors so we can build model
+```{r}
+house$Household.Head.Sex <- as.factor(house$Household.Head.Sex)
+house$Type.of.House.Extend <- as.factor(house$Type.of.House.Extend)
+house$Type.of.House.Single <- as.factor(house$Type.of.House.Single)
+```
+
+### Gaussian Model
+
+#### Gaussian Model
+```{r}
+model_gaussian_1 <- glm(Total.Number.of.Family.members ~ 
+                          Total.Household.Income + 
+                          Total.Food.Expenditure + 
+                          Household.Head.Sex + 
+                          Household.Head.Age + 
+                          House.Floor.Area + 
+                          House.Age + 
+                          Number.of.bedrooms + 
+                          Electricity + 
+                          Type.of.House.Single + 
+                          Type.of.House.Extend,
+                        data = house,
+                        family = gaussian)
+
+model_gaussian_1 %>% 
+  summary()
+```
+
+#### Inverse Gaussian Model
+```{r}
+model_inverse_gaussian_1 <- glm(Total.Number.of.Family.members ~ 
+                          Total.Household.Income + 
+                          Total.Food.Expenditure + 
+                          Household.Head.Sex + 
+                          Household.Head.Age + 
+                          House.Floor.Area + 
+                          House.Age + 
+                          Number.of.bedrooms + 
+                          Electricity + 
+                          Type.of.House.Single + 
+                          Type.of.House.Extend,
+                        data = house,
+                        family = inverse.gaussian,
+                        start = rep(0.5,11))
+
+model_inverse_gaussian_1 %>% 
+  summary()
+```
+
+### Poisson Model
+
+#### Poisson Model
+```{r}
+model_poisson_1 <- glm(Total.Number.of.Family.members ~ 
+                          Total.Household.Income + 
+                          Total.Food.Expenditure + 
+                          Household.Head.Sex + 
+                          Household.Head.Age + 
+                          House.Floor.Area + 
+                          House.Age + 
+                          Number.of.bedrooms + 
+                          Electricity + 
+                          Type.of.House.Single + 
+                          Type.of.House.Extend,
+                        data = house,
+                        family = poisson)
+
+model_poisson_1 %>% 
+  summary()
+```
+
+#### Quasipoisson Model
+
+```{r}
+model_quasi_poisson_1 <- glm(Total.Number.of.Family.members ~ 
+                          Total.Household.Income + 
+                          Total.Food.Expenditure + 
+                          Household.Head.Sex + 
+                          Household.Head.Age + 
+                          House.Floor.Area + 
+                          House.Age + 
+                          Number.of.bedrooms + 
+                          Electricity + 
+                          Type.of.House.Single + 
+                          Type.of.House.Extend,
+                        data = house,
+                        family = quasipoisson)
+
+model_quasi_poisson_1 %>% 
+  summary()
+```
+
+### Gamma Model
+
+```{r}
+model_gamma_1 <- glm(Total.Number.of.Family.members ~ 
+                          Total.Household.Income + 
+                          Total.Food.Expenditure + 
+                          Household.Head.Sex + 
+                          Household.Head.Age + 
+                          House.Floor.Area + 
+                          House.Age + 
+                          Number.of.bedrooms + 
+                          Electricity + 
+                          Type.of.House.Single + 
+                          Type.of.House.Extend,
+                        data = house,
+                        family = Gamma,
+                     start = rep(0.5, 11))
+
+model_gamma_1 %>% 
+  summary()
+```
+
+##### fitted values code
+```{r}
+model <- model %>%
+  mutate(fitted = predict(model))
+```
+
+##### plot code
+```{r}
+#### draw the CI for probablity
+plot_model(model, show.values = TRUE, transform = NULL,
+           title = "title", show.p = FALSE)
+
+#### draw the plot for estimated values
+ggplot(data = house, 
+       mapping = aes(x = XXX, 
+                     y = Total.Number.of.Family.members)) +
+  geom_smooth(method="glm", 
+              method.args = list(family="FAMILY"), 
+              se = FALSE) +
+  labs(x = "XXXX", y = "Total Number of Family members")
+
+#### draw the plot for estimated values with CI
+plot_model(model, type = "pred", title = "",
+            axis.title = c("XXXX", "Total Number of Family members"))
+```
+
+
+## Assumption Check
+
+##### Residual plots code
+```{r}
+resp <- resid(model, type = "pearson")
+resd <- resid(model, type = "deviance")
+
+
+p1 <- ggplot(model, aes(sample = resp)) + 
+  geom_point(stat = "qq", color = "#7fc97f") + 
+  ylab("Pearson residuals")
+
+p2 <- ggplot(model, aes(sample = resd)) + 
+  geom_point(stat = "qq", color = "#7fc97f") + 
+  ylab("Deviance residuals")
+
+p3 <- ggplot(model, aes(x = predict(model, type="default"), y =resd)) + 
+  geom_point(col = "#7fc97f") + 
+  ylab("Deviance residuals") + 
+  xlab("Linear predictor")
+### default values for type, as reference:
+### gaussian: identity
+### inverse-gaussian: 1/mu^2
+### poisson: log
+### quasipoisson: log
+### gamma: inverse
+
+grid.arrange(p1, p2, p3, nrow = 1)
+```
+

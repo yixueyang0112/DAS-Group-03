@@ -17,7 +17,9 @@ execute:
 ---
 
 ```{r}
+library(MASS)
 library(tidyverse)
+library(dplyr)
 library(moderndive)
 library(gapminder)
 library(sjPlot)
@@ -26,14 +28,20 @@ library(jtools)
 library(gt)
 library(GGally)
 library(gridExtra)
+
 ```
 
 # Introduction
 
-···data description···
+Outcome variable:
+
+`Total.Number.of.Family.members`:
+
+Explanatory variables: `Total.Household.Income`: ...write description of all variables here. can refer to the data description on moodel
 
 ```{r}
 house_data <- read.csv("dataset03.csv")
+
 ```
 
 ```{r}
@@ -42,7 +50,7 @@ house_data <- read.csv("dataset03.csv")
 #| echo: false
 
 house_data |>
-  select(Total.Household.Income:Total.Food.Expenditure) |>
+  dplyr::select(Total.Household.Income:Total.Food.Expenditure) |>
   slice_head(n = 6) |>
   gt()
 ```
@@ -53,7 +61,7 @@ house_data |>
 #| echo: false
 
 house_data |>
-  select(Household.Head.Sex:Total.Number.of.Family.members) |>
+  dplyr::select(Household.Head.Sex:Total.Number.of.Family.members) |>
   slice_head(n = 6) |>
   gt()
 ```
@@ -64,7 +72,7 @@ house_data |>
 #| echo: false
 
 house_data |>
-  select(House.Floor.Area:Electricity) |>
+  dplyr::select(House.Floor.Area:Electricity) |>
   slice_head(n = 6) |>
   gt()
 ```
@@ -74,7 +82,9 @@ house_data |>
 ···brief intro: describe we have numerical summary & visualization···
 
 ## Data Numerical Summary
+
 ···brief intro for each explanatory var,like mean is? median is? compare mean and median, ex. mean is bigger than median, indicating that existing outliers higher the mean;sd is? indicating the data distribution id dispersed or not?···
+
 ```{r}
 #| label: tbl-numerical-out
 #| tbl-cap: Numerical Summary for Total Number of Family Members
@@ -166,9 +176,10 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-
 ## Missing Values
+
 ···brief intro : just say that we do not have missing values···
+
 ```{r}
 #| label: tbl-missing1
 #| tbl-cap: missing value Part I
@@ -202,10 +213,9 @@ house_data %>%
   gt()
 ```
 
-
 # Data Visualization
 
-··· intro about each graph```
+··· intro about each graph\`\`\`
 
 ```{r}
 #| label: fig-pairs
@@ -214,7 +224,7 @@ house_data %>%
 #| fig-height: 9
 #| echo: false
 
-ggpairs(house[,c(5,1,2,4,6,7,8)])
+ggpairs(house_data[,c(5,1,2,4,6,7,8)])
 ```
 
 ```{r}
@@ -258,8 +268,10 @@ ggplot(data = house_data,
                  color = "white")
 ```
 
-## Data Processing
+## Data Wrangling
+
 ···intro of what we did here: transform the categorical variables with more 2 possible values into dummy variables···
+
 ```{r}
 house <- house_data %>%
   mutate(Type.of.House.Single = 
@@ -267,23 +279,29 @@ house <- house_data %>%
                   1, 0)) %>% 
   mutate(Type.of.House.Extend = 
            ifelse(Type.of.Household == "Extended Family",
-                  1, 0)) %>%
-  select(-c(Region,Type.of.Household))
+                  1, 0)) %>% 
+  dplyr::select(-Region, -Type.of.Household)
+
+house.x <- house %>%
+  dplyr::select(-Total.Number.of.Family.members)
+
+house.y <- house$Total.Number.of.Family.members
 ```
 
 # Generalized Linear Model
 
-## Model Construction
-~~~ transform the categorical variables into factors so we can build model
+\~\~\~ transform the categorical variables into factors so we can build model
+
 ```{r}
 house$Household.Head.Sex <- as.factor(house$Household.Head.Sex)
 house$Type.of.House.Extend <- as.factor(house$Type.of.House.Extend)
 house$Type.of.House.Single <- as.factor(house$Type.of.House.Single)
 ```
 
-### Gaussian Model
+## Gaussian Model
 
-#### Gaussian Model
+### Model Construction
+
 ```{r}
 model_gaussian_1 <- glm(Total.Number.of.Family.members ~ 
                           Total.Household.Income + 
@@ -303,30 +321,19 @@ model_gaussian_1 %>%
   summary()
 ```
 
-#### Inverse Gaussian Model
-```{r}
-model_inverse_gaussian_1 <- glm(Total.Number.of.Family.members ~ 
-                          Total.Household.Income + 
-                          Total.Food.Expenditure + 
-                          Household.Head.Sex + 
-                          Household.Head.Age + 
-                          House.Floor.Area + 
-                          House.Age + 
-                          Number.of.bedrooms + 
-                          Electricity + 
-                          Type.of.House.Single + 
-                          Type.of.House.Extend,
-                        data = house,
-                        family = inverse.gaussian,
-                        start = rep(0.5,11))
+### Model selection
 
-model_inverse_gaussian_1 %>% 
-  summary()
+```{r}
+model_gaussian_1.step_model <- stepAIC(glm(Total.Number.of.Family.members ~ ., data = house, family = gaussian), direction = "both")
+
+# Print the summary of the final model
+summary(model_gaussian_1.step_model)
 ```
 
-### Poisson Model
+## Poisson Model
 
-#### Poisson Model
+### Model Construction
+
 ```{r}
 model_poisson_1 <- glm(Total.Number.of.Family.members ~ 
                           Total.Household.Income + 
@@ -346,103 +353,60 @@ model_poisson_1 %>%
   summary()
 ```
 
-#### Quasipoisson Model
+### Model selection
 
 ```{r}
-model_quasi_poisson_1 <- glm(Total.Number.of.Family.members ~ 
-                          Total.Household.Income + 
-                          Total.Food.Expenditure + 
-                          Household.Head.Sex + 
-                          Household.Head.Age + 
-                          House.Floor.Area + 
-                          House.Age + 
-                          Number.of.bedrooms + 
-                          Electricity + 
-                          Type.of.House.Single + 
-                          Type.of.House.Extend,
-                        data = house,
-                        family = quasipoisson)
+model_poisson_1.step_model <- stepAIC(glm(Total.Number.of.Family.members ~ ., data = house, family = poisson), direction = "both")
 
-model_quasi_poisson_1 %>% 
-  summary()
+# Print the summary of the final model
+summary(model_poisson_1.step_model)
 ```
 
-### Gamma Model
+## Final Model Selection
+
+Considering the distribution of outcome variable `Total.Number.of.Family.members` and the sample size, we finally decide to use the poisson model.
+
+### Model Visualization
 
 ```{r}
-model_gamma_1 <- glm(Total.Number.of.Family.members ~ 
-                          Total.Household.Income + 
-                          Total.Food.Expenditure + 
-                          Household.Head.Sex + 
-                          Household.Head.Age + 
-                          House.Floor.Area + 
-                          House.Age + 
-                          Number.of.bedrooms + 
-                          Electricity + 
-                          Type.of.House.Single + 
-                          Type.of.House.Extend,
-                        data = house,
-                        family = Gamma,
-                     start = rep(0.5, 11))
+plot_model(model_poisson_1.step_model, show.values = TRUE, transform = NULL,
+           title = "95% CI of the Parameters", show.p = FALSE)
 
-model_gamma_1 %>% 
-  summary()
+
+ggplot(mapping = aes(x = model_poisson_1.step_model$fitted.values, 
+                     y = house$Total.Number.of.Family.members)) +
+  geom_point()+
+  labs(x = "Fitted Values", y = "Total Number of Family members",
+       'Fitted Values vs Observed Values')
+
 ```
-
-##### fitted values code
-```{r}
-model <- model %>%
-  mutate(fitted = predict(model))
-```
-
-##### plot code
-```{r}
-#### draw the CI for probablity
-plot_model(model, show.values = TRUE, transform = NULL,
-           title = "title", show.p = FALSE)
-
-#### draw the plot for estimated values
-ggplot(data = house, 
-       mapping = aes(x = XXX, 
-                     y = Total.Number.of.Family.members)) +
-  geom_smooth(method="glm", 
-              method.args = list(family="FAMILY"), 
-              se = FALSE) +
-  labs(x = "XXXX", y = "Total Number of Family members")
-
-#### draw the plot for estimated values with CI
-plot_model(model, type = "pred", title = "",
-            axis.title = c("XXXX", "Total Number of Family members"))
-```
-
 
 ## Assumption Check
 
-##### Residual plots code
+### Residual plots code
+
 ```{r}
-resp <- resid(model, type = "pearson")
-resd <- resid(model, type = "deviance")
+resp <- resid(model_poisson_1.step_model, type = "pearson")
+resd <- resid(model_poisson_1.step_model, type = "deviance")
 
 
-p1 <- ggplot(model, aes(sample = resp)) + 
+p1 <- ggplot(model_poisson_1.step_model, aes(sample = resp)) + 
   geom_point(stat = "qq", color = "#7fc97f") + 
   ylab("Pearson residuals")
 
-p2 <- ggplot(model, aes(sample = resd)) + 
+p2 <- ggplot(model_poisson_1.step_model, aes(sample = resd)) + 
   geom_point(stat = "qq", color = "#7fc97f") + 
   ylab("Deviance residuals")
 
-p3 <- ggplot(model, aes(x = predict(model, type="default"), y =resd)) + 
+p3 <- ggplot(model_poisson_1.step_model, 
+             aes(x =model_poisson_1.step_model$fitted.values, 
+                 y =resd)) + 
   geom_point(col = "#7fc97f") + 
   ylab("Deviance residuals") + 
   xlab("Linear predictor")
-### default values for type, as reference:
-### gaussian: identity
-### inverse-gaussian: 1/mu^2
-### poisson: log
-### quasipoisson: log
-### gamma: inverse
+
 
 grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
+# Conclusion

@@ -30,8 +30,9 @@ library(stats)
 library(jtools)
 library(gt)
 library(GGally)
+library(ggplot2)
 library(gridExtra)
-
+library(caret)
 ```
 
 # Introduction
@@ -39,7 +40,7 @@ library(gridExtra)
 With the data from the FIES (Family Income and Expenditure Survey)
 recorded in the Philippines, the analysis aims at finding which
 household related variables influence the number of people living in a
-household?
+household.
 
 ```{r}
 house_data <- read.csv("dataset03.csv")
@@ -510,7 +511,7 @@ not contribute significantly to the model based on AIC are removed. For
 instance, Type.of.House.Extend is consistently considered for
 removal.The aim is to simplify the model without sacrificing the
 explanatory power. This is achieved by ending up with variables that
-contribute meaningfully to the model..
+contribute meaningfully to the model.
 
 **final model Analysis**: The summary shows the results from a GLM where
 the response variable `Total.Number.of.Family.members` is being modeled
@@ -577,8 +578,9 @@ the model fits the data well compared to the null model. The
 significance codes indicate that most variables are highly significant
 predictors, except for **House.Floor.Area** and **Number.of.bedrooms**,
 which do not show a clear association with the number of family members
-in this model.\
-\### Model selection
+in this model.
+
+### Model selection
 
 ```{r}
 model_poisson_1.step_model <- 
@@ -659,6 +661,10 @@ to use the poisson model.
 ### Model Visualization
 
 ```{r}
+#| label: result-plots
+#| fig-cap: result plots of the final model
+#| echo: false
+
 plot_model(model_poisson_1.step_model, show.values = TRUE, transform = NULL,
            title = "95% CI of the Parameters", show.p = FALSE)
 
@@ -720,31 +726,39 @@ variance is higher than the variance predicted by the model.
 
 ## Assumption Check
 
-### Residual plots code
+### Residual Plots
 
 ```{r}
+#| label: fig-residual
+#| fig-cap: residual plot for final chosen model
+#| echo: false
+
 # Assuming you have a Poisson regression model called model_poisson_1.step_model
 residuals_poisson <- resid(model_poisson_1.step_model, type = "pearson")
 
 # QQ plot for the Pearson residuals
 qqnorm(residuals_poisson)
 qqline(residuals_poisson, col = "red")
-library(ggplot2)
+
 
 # Create a dataframe for plotting
 df_res <- data.frame(Residuals = residuals_poisson)
 
 # QQ plot using ggplot2
-p2<-ggplot(df_res, aes(sample = Residuals)) +
+p2 <- ggplot(df_res, aes(sample = Residuals)) +
   stat_qq() +
   stat_qq_line(col = "red") +
   ggtitle("QQ Plot of Pearson Residuals")
+
 #scatter plot for residuals
-p1<-ggplot(data = data.frame(Fitted = fitted(model_poisson_1.step_model), Residuals = residuals_poisson), aes(x = Fitted, y = Residuals)) +
+p1 <- ggplot(data = data.frame(Fitted = fitted(model_poisson_1.step_model),
+                               Residuals = residuals_poisson), 
+             aes(x = Fitted, y = Residuals)) +
   geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed",col="red") +
   labs(x = "Fitted Values", y = "Residuals")+
   ggtitle("Scatter Plot of Residuals")
+
 grid.arrange(p1, p2,nrow = 1)
 ```
 
@@ -790,42 +804,53 @@ tried a new model: negative binomial and a new way of checking the
 model: cross validation.
 
 ```{r}
-library(MASS)
-
 # Fitting a negative binomial model
-model_negbin <- glm.nb(Total.Number.of.Family.members ~ Total.Household.Income + Total.Food.Expenditure + Household.Head.Sex + Household.Head.Age + House.Age + Electricity + Type.of.House.Single, data = house)
+model_negbin <- glm.nb(Total.Number.of.Family.members ~ 
+                         Total.Household.Income + 
+                         Total.Food.Expenditure + 
+                         Household.Head.Sex + 
+                         Household.Head.Age + 
+                         House.Age + 
+                         Electricity + 
+                         Type.of.House.Single, 
+                       data = house)
 
 # Summarizing the model
 summary(model_negbin)
+```
+
+
+```{r}
+#| label: fig-negbin
+#| fig-cap: residual plots for negative binomial model
+#| echo: false
+
 residuals_negbin <- resid(model_negbin)
-ggplot(data = data.frame(Fitted = fitted(model_negbin), Residuals = residuals_negbin), aes(x = Fitted, y = Residuals)) +
+
+ggplot(data = data.frame(Fitted = fitted(model_negbin), 
+                         Residuals = residuals_negbin), 
+       aes(x = Fitted, y = Residuals)) +
   geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Fitted Values", y = "Residuals")
+
 # Assuming you have a model called model_negbin
 residuals_negbin <- resid(model_negbin, type = "pearson")  # Pearson residuals
 
 # QQ plot for the residuals
 qqnorm(residuals_negbin)
 qqline(residuals_negbin, col = "red")
-library(ggplot2)
 
 # QQ plot using ggplot2
-ggplot(data.frame(Residuals = residuals_negbin), aes(sample = Residuals)) +
+ggplot(data.frame(Residuals = residuals_negbin), 
+       aes(sample = Residuals)) +
   stat_qq() +
   stat_qq_line(col = "red") +
   ggtitle("QQ Plot of Model Residuals")
-
-
 ```
 
 ```{r}
-
-
 #cross validation for negtive binomial
-library(MASS)
-library(caret)
-
 set.seed(123) # for reproducibility
 
 # Define training control

@@ -28,6 +28,7 @@ To use this package, you need to have R and Rstdio installed on your system alon
 
 - MASS
 - tidyverse
+- dplyr
 - moderndive
 - gapminder
 - sjPlot
@@ -35,12 +36,15 @@ To use this package, you need to have R and Rstdio installed on your system alon
 - jtools
 - gt
 - GGally
+- ggplot2
 - gridExtra
+- caret
 
 
 ```R
 install.package(MASS)
 install.package(tidyverse)
+install.package(dplyr)
 install.package(moderndive)
 install.package(gapminder)
 install.package(sjPlot)
@@ -48,7 +52,9 @@ install.package(stats)
 install.package(jtools)
 install.package(gt)
 install.package(GGally)
+install.package(ggplot2)
 install.package(gridExtra)
+install.package(caret)
 ```
 
 

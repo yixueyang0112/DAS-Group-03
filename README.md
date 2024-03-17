@@ -36,7 +36,7 @@ To use this package, you need to have R and Rstdio installed on your system alon
 - gridExtra
 
 
-```{r}
+```r
 install.package(MASS)
 install.package(tidyverse)
 install.package(moderndive)

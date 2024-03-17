@@ -14,6 +14,9 @@ execute:
   eval: true
   warning: false
   message: false
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r}
@@ -28,12 +31,15 @@ library(jtools)
 library(gt)
 library(GGally)
 library(gridExtra)
-library(caret)
+
 ```
 
 # Introduction
 
-With the data from the FIES (Family Income and Expenditure Survey) recorded in the Philippines, the analysis aims at finding which household related variables influence the number of people living in a household?
+With the data from the FIES (Family Income and Expenditure Survey)
+recorded in the Philippines, the analysis aims at finding which
+household related variables influence the number of people living in a
+household?
 
 ```{r}
 house_data <- read.csv("dataset03.csv")
@@ -84,13 +90,15 @@ Among the data we have such variables:
 
 `Region`: The region of the Philippines which you have data for
 
-`Total.Food.Expenditure`: Annual expenditure by the household on food (in Philippine peso)
+`Total.Food.Expenditure`: Annual expenditure by the household on food
+(in Philippine peso)
 
 `Household.Head.Sex`: Head of the households sex
 
 `Household.Head.Age`: Head of the households age (in years)
 
-`Type.of.Household`: Relationship between the group of people living in the house
+`Type.of.Household`: Relationship between the group of people living in
+the house
 
 `House.Floor.Area`: Floor area of the house (in 𝑚!)
 
@@ -102,7 +110,9 @@ Among the data we have such variables:
 
 # Data Processing
 
-We first have a numerical summary and data visualization to get an overview of the distribution of each variable, and detect if there may exist relationships between variables.
+We first have a numerical summary and data visualization to get an
+overview of the distribution of each variable, and detect if there may
+exist relationships between variables.
 
 ## Data Numerical Summary
 
@@ -119,7 +129,13 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-`Total.Number.of.Family.members` holds a mean value as 4.68 and a median value as 4.00, which means there are more than 4 peoples in each house on average, and the median value of the number of family members is 4. The median value is lower than mean value, indicating the distribution may be right-skewed and affecting the mean value to deviate it from the median value. The standard deviation value is 2.30, indicating the distribution is not dispersed.
+`Total.Number.of.Family.members` holds a mean value as 4.68 and a median
+value as 4.00, which means there are more than 4 peoples in each house
+on average, and the median value of the number of family members is 4.
+The median value is lower than mean value, indicating the distribution
+may be right-skewed and affecting the mean value to deviate it from the
+median value. The standard deviation value is 2.30, indicating the
+distribution is not dispersed.
 
 ```{r}
 #| label: tbl-numerical-exp1
@@ -134,7 +150,13 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-`Total.Household.Income` holds a mean value as 214057.78 and a median value as 131806.00, which means the total household income in each family is 214057.78 on average and the median value of the household income in each family is 131806.00. The median value is lower than mean value, indicating the distribution may be right-skewed and affecting the mean value to deviate it from the median value. The standard deviation value is 232931.78, indicating the distribution may be dispersed.
+`Total.Household.Income` holds a mean value as 214057.78 and a median
+value as 131806.00, which means the total household income in each
+family is 214057.78 on average and the median value of the household
+income in each family is 131806.00. The median value is lower than mean
+value, indicating the distribution may be right-skewed and affecting the
+mean value to deviate it from the median value. The standard deviation
+value is 232931.78, indicating the distribution may be dispersed.
 
 ```{r}
 #| label: tbl-numerical-exp2
@@ -149,7 +171,13 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-`Total.Food.Expenditure` holds a mean value as 64112.59 and a median value as 54594.00, which means each family will spend 64112.59 on food on average and the median value of the food expenditure of each family is 54594.00. The median value is lower than mean value, indicating the distribution may be right-skewed and affecting the mean value to deviate it from the median value. The standard deviation value is 39497.08, indicating the distribution may be dispersed.
+`Total.Food.Expenditure` holds a mean value as 64112.59 and a median
+value as 54594.00, which means each family will spend 64112.59 on food
+on average and the median value of the food expenditure of each family
+is 54594.00. The median value is lower than mean value, indicating the
+distribution may be right-skewed and affecting the mean value to deviate
+it from the median value. The standard deviation value is 39497.08,
+indicating the distribution may be dispersed.
 
 ```{r}
 #| label: tbl-numerical-exp3
@@ -164,7 +192,13 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-`Household.Head.Age` holds a mean value as 51.52 and a median value as 51.00, which means the householder's age is bigger than 51 on average and the median value of the householder's age is 51. The median value is slightly lower than mean value, indicating the distribution may be slightly right-skewed and affecting the mean value to deviate it from the median value. The standard deviation value is 13.81, indicating the distribution may be dispersed.
+`Household.Head.Age` holds a mean value as 51.52 and a median value as
+51.00, which means the householder's age is bigger than 51 on average
+and the median value of the householder's age is 51. The median value is
+slightly lower than mean value, indicating the distribution may be
+slightly right-skewed and affecting the mean value to deviate it from
+the median value. The standard deviation value is 13.81, indicating the
+distribution may be dispersed.
 
 ```{r}
 #| label: tbl-numerical-exp4
@@ -179,7 +213,13 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-`House.Floor.Area` holds a mean value as 59.81 and a median value as 50.00, which means the house floor area is 59.81 on average and the median value of floor area in each family is 50.00. The median value is lower than mean value, indicating the distribution may be right-skewed and affecting the mean value to deviate it from the median value. The standard deviation value is 47.00, indicating the distribution may be dispersed.
+`House.Floor.Area` holds a mean value as 59.81 and a median value as
+50.00, which means the house floor area is 59.81 on average and the
+median value of floor area in each family is 50.00. The median value is
+lower than mean value, indicating the distribution may be right-skewed
+and affecting the mean value to deviate it from the median value. The
+standard deviation value is 47.00, indicating the distribution may be
+dispersed.
 
 ```{r}
 #| label: tbl-numerical-exp5
@@ -194,7 +234,12 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-`House.Age` holds a mean value as 19.50 and a median value as 16.00, which means the mean value of each house is 19.50 on average while the median value of the houses is 16. The median value is lower than mean value, indicating the distribution may be right-skewed and affecting the mean value to deviate it from the median value. The standard deviation value is 13.15, indicating the distribution may be dispersed.
+`House.Age` holds a mean value as 19.50 and a median value as 16.00,
+which means the mean value of each house is 19.50 on average while the
+median value of the houses is 16. The median value is lower than mean
+value, indicating the distribution may be right-skewed and affecting the
+mean value to deviate it from the median value. The standard deviation
+value is 13.15, indicating the distribution may be dispersed.
 
 ```{r}
 #| label: tbl-numerical-exp6
@@ -209,11 +254,18 @@ house_data |>
   fmt_number(decimals = 2)
 ```
 
-`Number.of.bedrooms` holds a mean value as 1.94 and a median value as 2.00, which means number of bedrooms in each house is less than 2 on average and the median value of bedrooms in each house is 2.00. The median value is slightly higher than mean value, indicating the distribution may be slightly left-skewed and affecting the mean value to deviate it from the median value. The standard deviation value is 1.08, indicating the distribution may not be dispersed.
+`Number.of.bedrooms` holds a mean value as 1.94 and a median value as
+2.00, which means number of bedrooms in each house is less than 2 on
+average and the median value of bedrooms in each house is 2.00. The
+median value is slightly higher than mean value, indicating the
+distribution may be slightly left-skewed and affecting the mean value to
+deviate it from the median value. The standard deviation value is 1.08,
+indicating the distribution may not be dispersed.
 
 ## Missing Values
 
-Brfore the formal modeling, we first check if there exists missing values in the data.
+Brfore the formal modeling, we first check if there exists missing
+values in the data.
 
 ```{r}
 #| label: tbl-missing1
@@ -248,11 +300,16 @@ house_data %>%
   gt()
 ```
 
-The result show that there is no missing values in the data, we can directly move to the next step to visualize and process the data, and construct the data.
+The result show that there is no missing values in the data, we can
+directly move to the next step to visualize and process the data, and
+construct the data.
 
 # Data Visualization
 
-Before the formal modeling phase, we draw pairs graph and box-plots to get an overview of the relationships between the variables. Then we draw a histogram of the outcome variable to check the distribution of thr outcome variables.
+Before the formal modeling phase, we draw pairs graph and box-plots to
+get an overview of the relationships between the variables. Then we draw
+a histogram of the outcome variable to check the distribution of thr
+outcome variables.
 
 ```{r}
 #| label: fig-pairs
@@ -264,7 +321,14 @@ Before the formal modeling phase, we draw pairs graph and box-plots to get an ov
 ggpairs(house_data[,c(7,1,3,5,8,9,10)])
 ```
 
-We draw a pairs graph @fig-pairs for the outcome variable and all non-categorical variables to check if there may exists relationship between the variables. The correlation values and sactter-plots in the pairs graph indicates that there may exists relationship between the `Total.Number.of.Family.members` and the `Total.Food.Expenditure`, and there may also exists weak relationship between the `Total.Number.of.Family.members` and `Total.Household.Income`, `Household.Head.Age`, `Number.of.bedrooms`.
+We draw a pairs graph @fig-pairs for the outcome variable and all
+non-categorical variables to check if there may exists relationship
+between the variables. The correlation values and sactter-plots in the
+pairs graph indicates that there may exists relationship between the
+`Total.Number.of.Family.members` and the `Total.Food.Expenditure`, and
+there may also exists weak relationship between the
+`Total.Number.of.Family.members` and `Total.Household.Income`,
+`Household.Head.Age`, `Number.of.bedrooms`.
 
 ```{r}
 #| label: fig-boxplot-categories
@@ -296,7 +360,13 @@ box3 <- ggplot(data = house_data,
 grid.arrange(box1, box2, box3, ncol = 3)
 ```
 
-Then we draw box-plots @fig-boxplot-categories for all the category variables to see if the outcome variable performs differently through the different category. Through the box-plots we can tell that `Total.Number.of.Family.members` seems performs differently in different sex of `Household.Head.Sex` and in different type of `Type.of.Household`. There seems no difference between `Total.Number.of.Family.members` in whether the house have electricity.
+Then we draw box-plots @fig-boxplot-categories for all the category
+variables to see if the outcome variable performs differently through
+the different category. Through the box-plots we can tell that
+`Total.Number.of.Family.members` seems performs differently in different
+sex of `Household.Head.Sex` and in different type of
+`Type.of.Household`. There seems no difference between
+`Total.Number.of.Family.members` in whether the house have electricity.
 
 ```{r}
 #| label: fig-hist-of-outcome
@@ -309,11 +379,18 @@ ggplot(data = house_data,
                  color = "white")
 ```
 
-Finally we draw a histogram @fig-hist-of-outcome for the outcome variable `Total.Number.of.Family.members` to get an overview of the distribution of the outcome variable. The distribution shows an obvious poisson distribution.
+Finally we draw a histogram @fig-hist-of-outcome for the outcome
+variable `Total.Number.of.Family.members` to get an overview of the
+distribution of the outcome variable. The distribution shows an obvious
+poisson distribution.
 
 ## Data Wrangling
 
-As there exists three different categories in the explanatory variable `Type.of.Household`: `Single Family`, `Extended Family`, `Two or More Nonrelated Persons/Members`, we split the variable in to two columns of dummy variables to test the influence of different category.
+As there exists three different categories in the explanatory variable
+`Type.of.Household`: `Single Family`, `Extended Family`,
+`Two or More Nonrelated Persons/Members`, we split the variable in to
+two columns of dummy variables to test the influence of different
+category.
 
 ```{r}
 house <- house_data %>%
@@ -333,7 +410,10 @@ house.y <- house$Total.Number.of.Family.members
 
 # Generalized Linear Model
 
-Preparing the dataset for analysis with a generalized linear model (GLM) by transforming categorical variables into factors. In R, factors are used to represent categorical data and are essential for fitting a GLM because they enable the model to treat these variables appropriately.
+Preparing the dataset for analysis with a generalized linear model (GLM)
+by transforming categorical variables into factors. In R, factors are
+used to represent categorical data and are essential for fitting a GLM
+because they enable the model to treat these variables appropriately.
 
 ```{r}
 house$Household.Head.Sex <- as.factor(house$Household.Head.Sex)
@@ -364,27 +444,48 @@ model_gaussian_1 %>%
   summary()
 ```
 
-In the model output, each coefficient indicates the expected change in the number of family members for each unit change in the predictor variables:
+In the model output, each coefficient indicates the expected change in
+the number of family members for each unit change in the predictor
+variables:
 
--   **Total.Household.Income**: More income correlates with fewer family members.
+-   **Total.Household.Income**: More income correlates with fewer family
+    members.
 
--   **Total.Food.Expenditure**: More spending on food is associated with more family members.
+-   **Total.Food.Expenditure**: More spending on food is associated with
+    more family members.
 
--   **Household.Head.SexMale**: Male-headed households tend to have more members.
+-   **Household.Head.SexMale**: Male-headed households tend to have more
+    members.
 
--   **Household.Head.Age** and **House.Age**: Older household heads and older houses are linked to fewer family members.
+-   **Household.Head.Age** and **House.Age**: Older household heads and
+    older houses are linked to fewer family members.
 
--   **Number.of.bedrooms**: The number of bedrooms doesn’t significantly affect family size.
+-   **Number.of.bedrooms**: The number of bedrooms doesn’t significantly
+    affect family size.
 
--   **Electricity**: Having electricity is related to fewer family members.
+-   **Electricity**: Having electricity is related to fewer family
+    members.
 
--   **Type.of.House.Single**: Single-type households tend to have fewer members, while **Type.of.House.Extend** does not show a significant effect. This output is from a generalized linear model (GLM) with a Gaussian family, indicating that the response variable (`Total.Number.of.Family.members`) is assumed to be normally distributed. The model estimates the relationship between the number of family members and several explanatory variables.
+-   **Type.of.House.Single**: Single-type households tend to have fewer
+    members, while **Type.of.House.Extend** does not show a significant
+    effect. This output is from a generalized linear model (GLM) with a
+    Gaussian family, indicating that the response variable
+    (`Total.Number.of.Family.members`) is assumed to be normally
+    distributed. The model estimates the relationship between the number
+    of family members and several explanatory variables.
 
--   **Significance**: The three asterisks next to the predictors' p-values denote a high level of statistical significance (p \< 0.001).
+-   **Significance**: The three asterisks next to the predictors'
+    p-values denote a high level of statistical significance (p \<
+    0.001).
 
--   **Model Fit**: The model has a null deviance of 9962.5 and a residual deviance of 6360.2. The lower residual deviance compared to the null deviance indicates that the model explains a significant portion of the variability in the response variable.
+-   **Model Fit**: The model has a null deviance of 9962.5 and a
+    residual deviance of 6360.2. The lower residual deviance compared to
+    the null deviance indicates that the model explains a significant
+    portion of the variability in the response variable.
 
--   **AIC**: The AIC of the model is 7671. The AIC is a measure of the relative quality of statistical models for a given set of data. Lower AIC values generally indicate a model is more parsimonious.
+-   **AIC**: The AIC of the model is 7671. The AIC is a measure of the
+    relative quality of statistical models for a given set of data.
+    Lower AIC values generally indicate a model is more parsimonious.
 
 ### Model selection
 
@@ -398,12 +499,35 @@ model_gaussian_1.step_model <-
 summary(model_gaussian_1.step_model)
 ```
 
+**Model Selection Process**: In the series of steps provided, we can
+see: The model starts with a relatively high AIC of 7671.91. Variables
+like Number.of.bedrooms, House.Floor.Area, and Type.of.House.Extend are
+evaluated for removal because removing them might lead to a lower AIC.
+In successive steps, different variables are considered for addition or
+removal. For example, House.Floor.Area is added back in and then
+considered for removal again. Throughout the process, variables that do
+not contribute significantly to the model based on AIC are removed. For
+instance, Type.of.House.Extend is consistently considered for
+removal.The aim is to simplify the model without sacrificing the
+explanatory power. This is achieved by ending up with variables that
+contribute meaningfully to the model..
 
-
-
-**Model Selection Process**: In the series of steps provided, we can see: The model starts with a relatively high AIC of 7671.91. Variables like Number.of.bedrooms, House.Floor.Area, and Type.of.House.Extend are evaluated for removal because removing them might lead to a lower AIC. In successive steps, different variables are considered for addition or removal. For example, House.Floor.Area is added back in and then considered for removal again. Throughout the process, variables that do not contribute significantly to the model based on AIC are removed. For instance, Type.of.House.Extend is consistently considered for removal.The aim is to simplify the model without sacrificing the explanatory power. This is achieved by ending up with variables that contribute meaningfully to the model..
-
-**final model Analysis**: The summary shows the results from a GLM where the response variable `Total.Number.of.Family.members` is being modeled as a function of various predictors. The family is set to `gaussian`, which suggests that the response variable is being treated as continuous with a normal distribution.All predictors are statistically significant, given the p-values are all less than 0.05.`Total.Household.Income` ,`House.Age` and `Electricity1`have negative coefficients, indicating that as these variables increase, the expected number of family members decreases.`Total.Food.Expenditure` and `Household.Head.SexMale`, have positive coefficients, suggesting that increases in these predictors are associated with an increase in the number of family members.`Type.of.House.Single1` has a large negative coefficient, which means that being a single-type household is associated with a significant decrease in the number of family members compared to the baseline household type (which could be 'extended' or another type not shown here).
+**final model Analysis**: The summary shows the results from a GLM where
+the response variable `Total.Number.of.Family.members` is being modeled
+as a function of various predictors. The family is set to `gaussian`,
+which suggests that the response variable is being treated as continuous
+with a normal distribution.All predictors are statistically significant,
+given the p-values are all less than 0.05.`Total.Household.Income`
+,`House.Age` and `Electricity1`have negative coefficients, indicating
+that as these variables increase, the expected number of family members
+decreases.`Total.Food.Expenditure` and `Household.Head.SexMale`, have
+positive coefficients, suggesting that increases in these predictors are
+associated with an increase in the number of family
+members.`Type.of.House.Single1` has a large negative coefficient, which
+means that being a single-type household is associated with a
+significant decrease in the number of family members compared to the
+baseline household type (which could be 'extended' or another type not
+shown here).
 
 ## Poisson Model
 
@@ -428,17 +552,33 @@ model_poisson_1 %>%
   summary()
 ```
 
-This is a Poisson generalized linear model predicting the number of family members. Here's a concise analysis:
+This is a Poisson generalized linear model predicting the number of
+family members. Here's a concise analysis:
 
--   The negative coefficient for **Total.Household.Income** suggests fewer family members in higher-income households.
--   **Total.Food.Expenditure** has a positive coefficient, indicating that families with higher food spending tend to be larger.
--   Male-headed households (**Household.Head.SexMale**) are associated with a higher number of family members.
--   An increase in **Household.Head.Age** and **House.Age** correlates with fewer family members.
--   **House.Floor.Area** is not statistically significant in this model, implying it may not be a good predictor for the number of family members.
--   Having electricity (**Electricity1**) is negatively associated with family size.
--   **Type.of.House.Single** households have significantly fewer family members, while **Type.of.House.Extend** is not significantly associated with family size.
+-   The negative coefficient for **Total.Household.Income** suggests
+    fewer family members in higher-income households.
+-   **Total.Food.Expenditure** has a positive coefficient, indicating
+    that families with higher food spending tend to be larger.
+-   Male-headed households (**Household.Head.SexMale**) are associated
+    with a higher number of family members.
+-   An increase in **Household.Head.Age** and **House.Age** correlates
+    with fewer family members.
+-   **House.Floor.Area** is not statistically significant in this model,
+    implying it may not be a good predictor for the number of family
+    members.
+-   Having electricity (**Electricity1**) is negatively associated with
+    family size.
+-   **Type.of.House.Single** households have significantly fewer family
+    members, while **Type.of.House.Extend** is not significantly
+    associated with family size.
 
-The model has a substantial AIC and the deviance information suggests the model fits the data well compared to the null model. The significance codes indicate that most variables are highly significant predictors, except for **House.Floor.Area** and **Number.of.bedrooms**, which do not show a clear association with the number of family members in this model. \### Model selection
+The model has a substantial AIC and the deviance information suggests
+the model fits the data well compared to the null model. The
+significance codes indicate that most variables are highly significant
+predictors, except for **House.Floor.Area** and **Number.of.bedrooms**,
+which do not show a clear association with the number of family members
+in this model.\
+\### Model selection
 
 ```{r}
 model_poisson_1.step_model <- 
@@ -450,33 +590,75 @@ model_poisson_1.step_model <-
 summary(model_poisson_1.step_model)
 ```
 
-**Model Selection Process**: Starting Model: The model begins with an AIC of 7630.12, with all the candidate variables included. Stepwise Adjustments: The algorithm evaluates the addition or subtraction of variables to find a model with a lower AIC. Variables considered for removal or addition include House.Floor.Area, Type.of.House.Extend, and Number.of.bedrooms. Throughout these steps, variables are assessed one at a time to determine their impact on the model's AIC. Model Refinement: The AIC fluctuates slightly as the stepwise algorithm adds and removes variables. This is a typical behavior in stepwise procedures as the algorithm explores the variable space. Final Steps: The algorithm reaches a point where the addition or subtraction of variables does not meaningfully lower the AIC, indicating a convergence towards an optimal set of variables. In the final steps, we observe that the variable Type.of.House.Single remains in the model, suggesting its significant contribution to explaining the variability in the number of family members. Conclusion: The lowest AIC achieved in the steps shown is 7626.04. This suggests that the final model includes Total.Household.Income, Total.Food.Expenditure, Household.Head.Sex, Household.Head.Age, House.Age, Electricity, and Type.of.House.Single as predictors. The model does not include House.Floor.Area or Type.of.House.Extend, as their inclusion does not improve the AIC. **final model Analysis**: The Poisson regression model provided aims to predict the `Total.Number.of.Family.members` based on various household factors. Here’s a concise analysis:
+**Model Selection Process**: Starting Model: The model begins with an
+AIC of 7630.12, with all the candidate variables included. Stepwise
+Adjustments: The algorithm evaluates the addition or subtraction of
+variables to find a model with a lower AIC. Variables considered for
+removal or addition include House.Floor.Area, Type.of.House.Extend, and
+Number.of.bedrooms. Throughout these steps, variables are assessed one
+at a time to determine their impact on the model's AIC. Model
+Refinement: The AIC fluctuates slightly as the stepwise algorithm adds
+and removes variables. This is a typical behavior in stepwise procedures
+as the algorithm explores the variable space. Final Steps: The algorithm
+reaches a point where the addition or subtraction of variables does not
+meaningfully lower the AIC, indicating a convergence towards an optimal
+set of variables. In the final steps, we observe that the variable
+Type.of.House.Single remains in the model, suggesting its significant
+contribution to explaining the variability in the number of family
+members. Conclusion: The lowest AIC achieved in the steps shown is
+7626.04. This suggests that the final model includes
+Total.Household.Income, Total.Food.Expenditure, Household.Head.Sex,
+Household.Head.Age, House.Age, Electricity, and Type.of.House.Single as
+predictors. The model does not include House.Floor.Area or
+Type.of.House.Extend, as their inclusion does not improve the AIC.
+**final model Analysis**: The Poisson regression model provided aims to
+predict the `Total.Number.of.Family.members` based on various household
+factors. Here’s a concise analysis:
 
--   **Intercept**: The expected log count of family members is about 1.727 when all other variables are zero.
--   **Total.Household.Income**: The negative coefficient suggests that with each unit increase in income, the log count of family members decreases, implying fewer family members in wealthier households.
--   **Total.Food.Expenditure**: The positive coefficient indicates that higher food expenditure is associated with a greater number of family members.
--   **Household.Head.SexMale**: The presence of a male household head is positively associated with the number of family members.
--   **Household.Head.Age**: Older household heads are associated with fewer family members.
--   **House.Age**: Similarly, greater house age is associated with fewer family members.
--   **Electricity**: The negative coefficient suggests that households with electricity have fewer family members, though this relationship is less strong (as indicated by the double asterisk denoting a p-value between 0.001 and 0.01).
--   **Type.of.House.Single**: Single-type households are associated with significantly fewer family members.
+-   **Intercept**: The expected log count of family members is about
+    1.727 when all other variables are zero.
+-   **Total.Household.Income**: The negative coefficient suggests that
+    with each unit increase in income, the log count of family members
+    decreases, implying fewer family members in wealthier households.
+-   **Total.Food.Expenditure**: The positive coefficient indicates that
+    higher food expenditure is associated with a greater number of
+    family members.
+-   **Household.Head.SexMale**: The presence of a male household head is
+    positively associated with the number of family members.
+-   **Household.Head.Age**: Older household heads are associated with
+    fewer family members.
+-   **House.Age**: Similarly, greater house age is associated with fewer
+    family members.
+-   **Electricity**: The negative coefficient suggests that households
+    with electricity have fewer family members, though this relationship
+    is less strong (as indicated by the double asterisk denoting a
+    p-value between 0.001 and 0.01).
+-   **Type.of.House.Single**: Single-type households are associated with
+    significantly fewer family members.
 
-All variables included are statistically significant, as indicated by p-values less than 0.05, except for **House.Floor.Area** which was not included in this final model.
+All variables included are statistically significant, as indicated by
+p-values less than 0.05, except for **House.Floor.Area** which was not
+included in this final model.
 
-The model's AIC is 7626, which is a measure of the relative quality of the model; a lower AIC indicates a better fit to the data while penalizing for the number of explanatory variables used.
+The model's AIC is 7626, which is a measure of the relative quality of
+the model; a lower AIC indicates a better fit to the data while
+penalizing for the number of explanatory variables used.
 
-The null deviance and residual deviance show a considerable reduction when going from a model with only an intercept (null model) to the current model, indicating that the predictors provide substantial information in explaining the variability of the number of family members.
+The null deviance and residual deviance show a considerable reduction
+when going from a model with only an intercept (null model) to the
+current model, indicating that the predictors provide substantial
+information in explaining the variability of the number of family
+members.
 
 ## Final Model Selection
 
-Considering the distribution of outcome variable `Total.Number.of.Family.members` and the sample size, we finally decide to use the poisson model.
+Considering the distribution of outcome variable
+`Total.Number.of.Family.members` and the sample size, we finally decide
+to use the poisson model.
 
 ### Model Visualization
 
 ```{r}
-#| label: result-plots
-#| fig-cap: results-plots
-#| echo: false
 plot_model(model_poisson_1.step_model, show.values = TRUE, transform = NULL,
            title = "95% CI of the Parameters", show.p = FALSE)
 
@@ -489,119 +671,175 @@ ggplot(mapping = aes(x = model_poisson_1.step_model$fitted.values,
 
 ```
 
-The plot shows the 95% confidence intervals (CI) of the log-mean coefficients from a Poisson regression model. Each horizontal line represents the range within which we can be 95% confident the true value of the coefficient lies. The points are the estimated coefficients, and their position along the x-axis indicates the magnitude and direction of the relationship between each predictor and the log-count of family members.
+The plot shows the 95% confidence intervals (CI) of the log-mean
+coefficients from a Poisson regression model. Each horizontal line
+represents the range within which we can be 95% confident the true value
+of the coefficient lies. The points are the estimated coefficients, and
+their position along the x-axis indicates the magnitude and direction of
+the relationship between each predictor and the log-count of family
+members.
 
--   **Total Household Income** and **Electricity \[1\]** have negative coefficients, suggesting that as income increases and when electricity is available, the log-count of family members decreases.
--   **Total Food Expenditure** and **Household Head Sex \[Male\]** have positive coefficients, indicating an increase in the log-count of family members with higher food expenditure and in male-headed households.
--   **Household Head Age** and **House Age** also have negative coefficients, indicating fewer family members in households with older heads and older houses.
--   **Type of House Single \[1\]** has the largest negative effect, suggesting that single-type houses are associated with a much lower log-count of family members.
+-   **Total Household Income** and **Electricity \[1\]** have negative
+    coefficients, suggesting that as income increases and when
+    electricity is available, the log-count of family members decreases.
+-   **Total Food Expenditure** and **Household Head Sex \[Male\]** have
+    positive coefficients, indicating an increase in the log-count of
+    family members with higher food expenditure and in male-headed
+    households.
+-   **Household Head Age** and **House Age** also have negative
+    coefficients, indicating fewer family members in households with
+    older heads and older houses.
+-   **Type of House Single \[1\]** has the largest negative effect,
+    suggesting that single-type houses are associated with a much lower
+    log-count of family members.
 
-The fact that the confidence intervals for some coefficients (such as Total Household Income and Household Head Age) do not cross the zero line indicates that these effects are statistically significant at the 95% confidence level. This plot is useful for quickly assessing the significance and strength of predictors in your model.
+The fact that the confidence intervals for some coefficients (such as
+Total Household Income and Household Head Age) do not cross the zero
+line indicates that these effects are statistically significant at the
+95% confidence level. This plot is useful for quickly assessing the
+significance and strength of predictors in your model.
 
-The plot is a scatter plot of observed versus fitted values from a Poisson regression model. In this type of plot:
+The plot is a scatter plot of observed versus fitted values from a
+Poisson regression model. In this type of plot:
 
--   The x-axis represents the fitted values (predicted counts of family members) from your model.
--   The y-axis represents the observed counts of family members from your dataset.
+-   The x-axis represents the fitted values (predicted counts of family
+    members) from your model.
+-   The y-axis represents the observed counts of family members from
+    your dataset.
 
-The plot is typically used to assess the model's goodness of fit. Ideally, if the model fits well, we would expect to see the points forming a diagonal line from the bottom left to the top right.
+The plot is typically used to assess the model's goodness of fit.
+Ideally, if the model fits well, we would expect to see the points
+forming a diagonal line from the bottom left to the top right.
 
-From the plot, it looks like for lower predicted values, the model fits quite well as the points are closely packed and increase linearly. However, as the fitted values increase, the variance also increases, and the points start to scatter more widely. This pattern could suggest potential overdispersion in the data, which is when the observed variance is higher than the variance predicted by the model.
+From the plot, it looks like for lower predicted values, the model fits
+quite well as the points are closely packed and increase linearly.
+However, as the fitted values increase, the variance also increases, and
+the points start to scatter more widely. This pattern could suggest
+potential overdispersion in the data, which is when the observed
+variance is higher than the variance predicted by the model.
 
 ## Assumption Check
 
 ### Residual plots code
 
 ```{r}
-#| label: residuals-plots
-#| fig-cap: residual-plots
-#| echo: false
+# Assuming you have a Poisson regression model called model_poisson_1.step_model
+residuals_poisson <- resid(model_poisson_1.step_model, type = "pearson")
 
-resp <- resid(model_poisson_1.step_model, type = "pearson")
-resd <- resid(model_poisson_1.step_model, type = "deviance")
+# QQ plot for the Pearson residuals
+qqnorm(residuals_poisson)
+qqline(residuals_poisson, col = "red")
+library(ggplot2)
 
+# Create a dataframe for plotting
+df_res <- data.frame(Residuals = residuals_poisson)
 
-p1 <- ggplot(model_poisson_1.step_model, aes(sample = resp)) + 
-  geom_point(stat = "qq", color = "#7fc97f") + 
-  ylab("Pearson residuals")
-
-p2 <- ggplot(model_poisson_1.step_model, aes(sample = resd)) + 
-  geom_point(stat = "qq", color = "#7fc97f") + 
-  ylab("Deviance residuals")
-
-p3 <- ggplot(model_poisson_1.step_model, 
-             aes(x =model_poisson_1.step_model$fitted.values, 
-                 y =resd)) + 
-  geom_point(col = "#7fc97f") +
-  geom_hline(yintercept = 0, linetype = "dashed") +
-  ylab("Deviance residuals") + 
-  xlab("Linear predictor")
-
-
-grid.arrange(p1, p2, p3, nrow = 1)
+# QQ plot using ggplot2
+p2<-ggplot(df_res, aes(sample = Residuals)) +
+  stat_qq() +
+  stat_qq_line(col = "red") +
+  ggtitle("QQ Plot of Pearson Residuals")
+#scatter plot for residuals
+p1<-ggplot(data = data.frame(Fitted = fitted(model_poisson_1.step_model), Residuals = residuals_poisson), aes(x = Fitted, y = Residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed",col="red") +
+  labs(x = "Fitted Values", y = "Residuals")+
+  ggtitle("Scatter Plot of Residuals")
+grid.arrange(p1, p2,nrow = 1)
 ```
 
-These are plots for a Poisson regression model, specifically checking the residuals of the model:
-
-1.  **QQ Plots of Pearson and Deviance Residuals**: The first two plots are quantile-quantile (QQ) plots for Pearson and deviance residuals, respectively. They compare the residuals to a theoretical normal distribution. In a well-fitted model, points should approximately follow the 45-degree line.
-
-    -   In both QQ plots, the residuals show a clear deviation from the theoretical normal distribution line, especially at the tails. This suggests that the residuals are not normally distributed in total and indicates that the model may not be adequately capturing all aspects of the data's structure—common in count data models like Poisson when overdispersion is present.
-
-2.  **Residuals vs. Linear Predictor**: The third plot shows the deviance residuals against the fitted values (linear predictor).
-
-    -   Ideally, you would want to see a random scatter of points without any discernible pattern. However, the plot shows a fanning out effect (increasing spread of residuals with the fitted values), which is a sign of overdispersion or nonlinearity in the data.
+These are plots for a Poisson regression model, specifically checking
+the residuals of the model: **Scatter Plot of Residuals:** - The
+residuals around the center of the plot (near the red dashed line which
+represents zero residual) suggest that for a significant number of
+observations, the model is performing well, providing a good fit. - The
+points do not show any clear systematic curve or trend around the
+central fitted values, which is a positive sign that the model is
+appropriate for the central range of the data. **QQ Plot of Pearson
+Residuals:** - The middle section of the QQ plot, where the points
+follow the reference line closely, indicates that the model's residuals
+are approximately normally distributed in this central portion. - The
+model captures the median behavior of the data well, as indicated by the
+adherence of the residuals to the red line in the central part of the
+distribution.
 
 # Conclusion
 
-In this analysis, General Linear model is applied to detect the relationship between the total number of family members in each house and other variables and to find which related variables influence the number of people living in a household.
+In this analysis, General Linear model is applied to detect the
+relationship between the total number of family members in each house
+and other variables and to find which related variables influence the
+number of people living in a household.
 
-Numerical summary and data visualization are used to overview the data distribution and relationship, then the GLM is applied in both Poisson and Gaussian model, considering about the distribution of outcome variables, the Poisson model is finally chosen. The explanatory variables `Total.Household.Income`, `Total.Food.Expenditure`, `Household.Head.Sex`, `Household.Head.Age`, `House.Age`, `Electrivity`, and `Type.of.House` in `Single` is retained in the final model. The plot of 95% CI of the Parameters is drawn. The assumption check is conducted and the assumptions are proved to be valid.
+Numerical summary and data visualization are used to overview the data
+distribution and relationship, then the GLM is applied in both Poisson
+and Gaussian model, considering about the distribution of outcome
+variables, the Poisson model is finally chosen. The explanatory
+variables `Total.Household.Income`, `Total.Food.Expenditure`,
+`Household.Head.Sex`, `Household.Head.Age`, `House.Age`, `Electrivity`,
+and `Type.of.House` in `Single` is retained in the final model. The plot
+of 95% CI of the Parameters is drawn. The assumption check is conducted
+and the assumptions are proved to be valid.
 
 # Further Work
+
 ## New Model Attempt
-Since when checking the residuals of the final model, it was found that there was a certain linear relationship between the residuals. So we tried a new model: negative binomial and a new way of checking the model: cross validation.
+
+Since when checking the residuals of the final model, it was found that
+there was a certain linear relationship between the residuals. So we
+tried a new model: negative binomial and a new way of checking the
+model: cross validation.
+
 ```{r}
+library(MASS)
+
 # Fitting a negative binomial model
-model_negbin <- glm.nb(Total.Number.of.Family.members ~ 
-                         Total.Household.Income + 
-                         Total.Food.Expenditure + 
-                         Household.Head.Sex + 
-                         Household.Head.Age + 
-                         House.Age + 
-                         Electricity + 
-                         Type.of.House.Single, data = house)
+model_negbin <- glm.nb(Total.Number.of.Family.members ~ Total.Household.Income + Total.Food.Expenditure + Household.Head.Sex + Household.Head.Age + House.Age + Electricity + Type.of.House.Single, data = house)
 
 # Summarizing the model
 summary(model_negbin)
-```
-
-```{r}
-#| label: final-plot
-#| fig-cap: final-plot
-#| echo: false
-
 residuals_negbin <- resid(model_negbin)
-ggplot(data = data.frame(Fitted = fitted(model_negbin), 
-                         Residuals = residuals_negbin), 
-       aes(x = Fitted, y = Residuals)) +
+ggplot(data = data.frame(Fitted = fitted(model_negbin), Residuals = residuals_negbin), aes(x = Fitted, y = Residuals)) +
   geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(x = "Fitted Values", y = "Residuals")
+# Assuming you have a model called model_negbin
+residuals_negbin <- resid(model_negbin, type = "pearson")  # Pearson residuals
+
+# QQ plot for the residuals
+qqnorm(residuals_negbin)
+qqline(residuals_negbin, col = "red")
+library(ggplot2)
+
+# QQ plot using ggplot2
+ggplot(data.frame(Residuals = residuals_negbin), aes(sample = Residuals)) +
+  stat_qq() +
+  stat_qq_line(col = "red") +
+  ggtitle("QQ Plot of Model Residuals")
+
+
 ```
 
-
 ```{r}
+
+
+#cross validation for negtive binomial
+library(MASS)
+library(caret)
+
 set.seed(123) # for reproducibility
 
 # Define training control
 train_control <- trainControl(method = "cv", number = 10)
 
 # Fit the model using caret's train function
-model_negbin_cv <- train(Total.Number.of.Family.members ~ ., 
+model_nb_cv <- train(Total.Number.of.Family.members ~ ., 
                          data = house, 
                          method = "glm.nb", 
                          trControl = train_control)
 
 # Print the results
-print(model_negbin_cv)
+print(model_nb_cv)
 ```
 
+So, follow these step we can compare the poisson and negative-binomial
+to find which will be better for our data.
